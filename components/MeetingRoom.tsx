@@ -10,7 +10,7 @@ import {
   useCallStateHooks,
 } from '@stream-io/video-react-sdk';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Users, LayoutList, Maximize, Minimize } from 'lucide-react';
+import { Users, LayoutList, Expand } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -21,8 +21,7 @@ import {
 } from './ui/dropdown-menu';
 import Loader from './Loader';
 import EndCallButton from './EndCallButton';
-
-
+import { cn } from '@/lib/utils';
 
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
 
@@ -30,21 +29,22 @@ const MeetingRoom = () => {
   const searchParams = useSearchParams();
   const isPersonalRoom = !!(searchParams.get('personal') ?? '');
   const router = useRouter();
-  const [layout, setLayout] = useState<CallLayoutType>('grid');
+  const [layout, setLayout] = useState<CallLayoutType>('grid'); // Default to grid layout
   const [showParticipants, setShowParticipants] = useState(false);
-  const [isFullScreen, setIsFullScreen] = useState(false);
-  const controlsRef = useRef<HTMLDivElement>(null);
+  const [isFullScreen, setIsFullScreen] = useState(false); // Fullscreen state
   const { useCallCallingState } = useCallStateHooks();
   const callingState = useCallCallingState();
 
+  const roomRef = useRef<HTMLDivElement>(null); // Fix for React 19 ref issue
+
   if (callingState !== CallingState.JOINED) return <Loader />;
 
+  // Handle Full-Screen Toggle
   const toggleFullScreen = () => {
-    const element = document.documentElement;
-    if (!document.fullscreenElement && element.requestFullscreen) {
-      element.requestFullscreen();
+    if (!document.fullscreenElement) {
+      roomRef.current?.requestFullscreen();
       setIsFullScreen(true);
-    } else if (document.exitFullscreen) {
+    } else {
       document.exitFullscreen();
       setIsFullScreen(false);
     }
@@ -62,71 +62,68 @@ const MeetingRoom = () => {
   };
 
   return (
-    <section className="relative h-screen w-full overflow-hidden pt-4 text-white">
+    <section
+      ref={roomRef}
+      className="relative h-screen w-full overflow-hidden pt-4 text-white"
+    >
       <div className="relative flex size-full items-center justify-center">
-        <div className="flex size-full w-full items-center">
+        <div className="flex size-full max-w-full items-center">
           <CallLayout />
         </div>
-
-        {/* Participants Panel (Desktop & Mobile) */}
-        {showParticipants && (
-          <div className="absolute top-0 right-0 h-full w-[300px] bg-black p-2">
-            <CallParticipantsList onClose={() => setShowParticipants(false)} />
-          </div>
-        )}
+        {/* Participants List */}
+        <div
+          className={cn('h-[calc(100vh-86px)] hidden ml-2', {
+            'show-block': showParticipants,
+          })}
+        >
+          <CallParticipantsList onClose={() => setShowParticipants(false)} />
+        </div>
       </div>
 
-      {/* Scrollable Controls Menu */}
-      <div
-        ref={controlsRef}
-        className="fixed bottom-0 flex w-full items-center justify-center overflow-x-auto bg-black/80 p-3"
-      >
-        <div className="flex items-center gap-3 px-5">
-          <CallControls onLeave={() => router.push(`/`)} />
+      {/* Video layout and call controls */}
+      <div className="fixed bottom-0 flex w-full items-center justify-center gap-5">
+        <CallControls onLeave={() => router.push(`/`)} />
 
-          {/* Layout Change Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
-              <LayoutList size={20} className="text-white" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="border-dark-1 bg-dark-1 text-white">
-              {['Grid', 'Speaker-Left', 'Speaker-Right'].map((item, index) => (
-                <div key={index}>
-                  <DropdownMenuItem
-                    onClick={() => setLayout(item.toLowerCase() as CallLayoutType)}
-                  >
-                    {item}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator className="border-dark-1" />
-                </div>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+        {/* Layout Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
+            <LayoutList size={20} className="text-white" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="border-dark-1 bg-dark-1 text-white">
+            {['Grid', 'Speaker-Left', 'Speaker-Right'].map((item, index) => (
+              <div key={index}>
+                <DropdownMenuItem
+                  onClick={() =>
+                    setLayout(item.toLowerCase() as CallLayoutType)
+                  }
+                >
+                  {item}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="border-dark-1" />
+              </div>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-          {/* Call Stats Button */}
-          <CallStatsButton />
+        {/* Call Stats */}
+        <CallStatsButton />
 
-          {/* Toggle Participants Panel */}
-          <button onClick={() => setShowParticipants((prev) => !prev)}>
-            <div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
-              <Users size={20} className="text-white" />
-            </div>
-          </button>
+        {/* Show Participants Button */}
+        <button onClick={() => setShowParticipants((prev) => !prev)}>
+          <div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
+            <Users size={20} className="text-white" />
+          </div>
+        </button>
 
-          {/* Full-Screen Toggle Button */}
-          <button onClick={toggleFullScreen}>
-            <div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
-              {isFullScreen ? (
-                <Minimize size={20} className="text-white" />
-              ) : (
-                <Maximize size={20} className="text-white" />
-              )}
-            </div>
-          </button>
+        {/* Full Screen Button */}
+        <button onClick={toggleFullScreen}>
+          <div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
+            <Expand size={20} className="text-white" />
+          </div>
+        </button>
 
-          {/* End Call Button (if not a personal room) */}
-          {!isPersonalRoom && <EndCallButton />}
-        </div>
+        {/* End Call Button (if not personal room) */}
+        {!isPersonalRoom && <EndCallButton />}
       </div>
     </section>
   );
