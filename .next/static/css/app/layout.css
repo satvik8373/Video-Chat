@@ -1,5 +1,5 @@
 /*!*************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[3]!./app/globals.css ***!
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[10].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[10].use[3]!./app/globals.css ***!
   \*************************************************************************************************************************************************************************************************************************************************************/
 /*
 ! tailwindcss v3.4.1 | MIT License | https://tailwindcss.com
@@ -582,9 +582,6 @@ video {
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
 }
-.ml-2 {
-  margin-left: 0.5rem;
-}
 .ml-auto {
   margin-left: auto;
 }
@@ -596,9 +593,6 @@ video {
 }
 .grid {
   display: grid;
-}
-.hidden {
-  display: none;
 }
 .size-10 {
   width: 2.5rem;
@@ -656,9 +650,6 @@ video {
 .h-\[calc\(100vh-72px\)\] {
   height: calc(100vh - 72px);
 }
-.h-\[calc\(100vh-86px\)\] {
-  height: calc(100vh - 86px);
-}
 .h-full {
   height: 100%;
 }
@@ -699,14 +690,14 @@ video {
 .w-full {
   width: 100%;
 }
+.w-screen {
+  width: 100vw;
+}
 .min-w-\[8rem\] {
   min-width: 8rem;
 }
 .max-w-60 {
   max-width: 15rem;
-}
-.max-w-\[1000px\] {
-  max-width: 1000px;
 }
 .max-w-\[264px\] {
   max-width: 264px;
@@ -884,10 +875,6 @@ video {
 .border-none {
   border-style: none;
 }
-.border-dark-1 {
-  --tw-border-opacity: 1;
-  border-color: rgb(28 31 46 / var(--tw-border-opacity));
-}
 .border-dark-3 {
   --tw-border-opacity: 1;
   border-color: rgb(37 42 65 / var(--tw-border-opacity));
@@ -907,6 +894,13 @@ video {
 .bg-\[\#232d37\] {
   --tw-bg-opacity: 1;
   background-color: rgb(35 45 55 / var(--tw-bg-opacity));
+}
+.bg-black {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+}
+.bg-black\/50 {
+  background-color: rgb(0 0 0 / 0.5);
 }
 .bg-black\/80 {
   background-color: rgb(0 0 0 / 0.8);
@@ -1063,9 +1057,6 @@ video {
 }
 .pt-28 {
   padding-top: 7rem;
-}
-.pt-4 {
-  padding-top: 1rem;
 }
 .text-center {
   text-align: center;
@@ -2070,11 +2061,11 @@ video {
 
 
 /*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[2].use[1]!./node_modules/next/dist/build/webpack/loaders/next-font-loader/index.js??ruleSet[1].rules[14].oneOf[2].use[2]!./node_modules/next/font/google/target.css?{"path":"app\\layout.tsx","import":"Inter","arguments":[{"subsets":["latin"]}],"variableName":"inter"} ***!
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[2].use[1]!./node_modules/next/dist/build/webpack/loaders/next-font-loader/index.js??ruleSet[1].rules[13].oneOf[2].use[2]!./node_modules/next/font/google/target.css?{"path":"app\\layout.tsx","import":"Inter","arguments":[{"subsets":["latin"]}],"variableName":"inter"} ***!
   \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /* cyrillic-ext */
 @font-face {
-  font-family: '__Inter_d65c78';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
@@ -2083,7 +2074,7 @@ video {
 }
 /* cyrillic */
 @font-face {
-  font-family: '__Inter_d65c78';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
@@ -2092,7 +2083,7 @@ video {
 }
 /* greek-ext */
 @font-face {
-  font-family: '__Inter_d65c78';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
@@ -2101,7 +2092,7 @@ video {
 }
 /* greek */
 @font-face {
-  font-family: '__Inter_d65c78';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
@@ -2110,7 +2101,7 @@ video {
 }
 /* vietnamese */
 @font-face {
-  font-family: '__Inter_d65c78';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
@@ -2119,7 +2110,7 @@ video {
 }
 /* latin-ext */
 @font-face {
-  font-family: '__Inter_d65c78';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
@@ -2128,18 +2119,18 @@ video {
 }
 /* latin */
 @font-face {
-  font-family: '__Inter_d65c78';
+  font-family: 'Inter';
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
   src: url(/_next/static/media/a34f9d1faa5f3315-s.p.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}@font-face {font-family: '__Inter_Fallback_d65c78';src: local("Arial");ascent-override: 90.49%;descent-override: 22.56%;line-gap-override: 0.00%;size-adjust: 107.06%
-}.__className_d65c78 {font-family: '__Inter_d65c78', '__Inter_Fallback_d65c78';font-style: normal
+}@font-face {font-family: 'Inter Fallback';src: local("Arial");ascent-override: 90.44%;descent-override: 22.52%;line-gap-override: 0.00%;size-adjust: 107.12%
+}.__className_d65c78 {font-family: 'Inter', 'Inter Fallback';font-style: normal
 }
 
 /*!*********************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[3]!./node_modules/@stream-io/video-react-sdk/dist/css/styles.css ***!
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[10].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[10].use[3]!./node_modules/@stream-io/video-react-sdk/dist/css/styles.css ***!
   \*********************************************************************************************************************************************************************************************************************************************************************************************************/
 @charset "UTF-8";
 .str-video *,
@@ -4674,7 +4665,7 @@ video {
 /*# sourceMappingURL=styles.css.map */
 
 /*!*****************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[3]!./node_modules/react-datepicker/dist/react-datepicker.css ***!
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[10].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[10].use[3]!./node_modules/react-datepicker/dist/react-datepicker.css ***!
   \*****************************************************************************************************************************************************************************************************************************************************************************************************/
 @charset "UTF-8";
 .react-datepicker__year-read-view--down-arrow,
@@ -5442,79 +5433,4 @@ video {
   height: 1em;
   vertical-align: -0.125em;
 }
-
-
-/* Speaker Layout */
-.str-video__speaker-layout {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  width: 100%;
-  height: 100vh;
-}
-
-/* Spotlight View for Admin (Left Side) */
-.str-video__speaker-layout__spotlight {
-  width: 50%;
-  max-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  background: rgba(0, 0, 0, 0.1);
-}
-
-/* Participants View (Right Side) */
-.str-video__speaker-layout__participants-bar-wrapper {
-  width: 1000%;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  overflow: auto;
-  padding: 10px;
-}
-
-/* Individual Participant View */
-
-.str-video__participant-view {
-  width: 140%;
-  height: auto;
-  max-height: 100vh;
-  display: flex
-;
-  justify-content: center;
-  align-items: center;
-  object-fit: cover;
-  border-radius: 10px;
-  overflow: hidden;
-}
-.size-full {
-  width: 100%;
-  /* height: 100%; */
-}
-
-@media (max-width: 768px) {
-  /* Adjust layout for mobile portrait view */
-  .str-video__speaker-layout {
-    flex-direction: column; /* Stack admin and participants */
-    height: auto;
-  }
-
-  .str-video__speaker-layout__spotlight {
-    width: 10%; /* Admin takes full width on mobile */
-    max-height: 50vh; /* Reduce height for better spacing */
-  }
-
-  .str-video__speaker-layout__participants-bar-wrapper {
-    width: 100%; /* Participants take full width */
-    grid-template-columns: repeat(2, 1fr); /* Show 2 per row */
-  }
-
-  .str-video__participant-view {
-    max-height: 50vh; /* Adjust height for better mobile display */
-  }
-}
-
 
