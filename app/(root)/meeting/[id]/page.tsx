@@ -13,11 +13,15 @@ import MeetingRoom from '@/components/MeetingRoom';
 
 const MeetingPage = () => {
   const { id } = useParams();
-  const { isLoaded, user } = useUser();
-  const { call, isCallLoading } = useGetCallById(id);
+  const safeId = id ?? ''; // Ensures `id` is a string
+  
+  const { call, isCallLoading } = useGetCallById(safeId);
+  
   const [isSetupComplete, setIsSetupComplete] = useState(false);
-
+  const { isLoaded, user } = useUser();
+  
   if (!isLoaded || isCallLoading) return <Loader />;
+  
 
   if (!call) return (
     <p className="text-center text-3xl font-bold text-white">
