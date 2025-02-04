@@ -39,9 +39,15 @@ const MeetingRoom = () => {
   if (callingState !== CallingState.JOINED) return <Loader />;
 
   const CallLayout = () => {
+    switch (layout) {
+      case 'grid':
         return <PaginatedGridLayout />;
+      case 'speaker-right':
+        return <SpeakerLayout participantsBarPosition="left" />;
+      default:
+        return <SpeakerLayout participantsBarPosition="right" />;
+    }
   };
-
 
   return (
     <section className="relative h-screen w-full overflow-hidden pt-4 text-white">
