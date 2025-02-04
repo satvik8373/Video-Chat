@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import {
   CallControls,
   CallParticipantsList,
@@ -10,7 +10,7 @@ import {
   useCallStateHooks,
 } from '@stream-io/video-react-sdk';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Users, LayoutList, Expand } from 'lucide-react';
+import { Users, LayoutList, Maximize, Minimize } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -31,21 +31,19 @@ const MeetingRoom = () => {
   const router = useRouter();
   const [layout, setLayout] = useState<CallLayoutType>('grid'); // Default to grid layout
   const [showParticipants, setShowParticipants] = useState(false);
-  const [isFullScreen, setIsFullScreen] = useState(false); // Fullscreen state
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const { useCallCallingState } = useCallStateHooks();
   const callingState = useCallCallingState();
 
-  const roomRef = useRef<HTMLDivElement>(null); // Fix for React 19 ref issue
-
   if (callingState !== CallingState.JOINED) return <Loader />;
 
-  // Handle Full-Screen Toggle
+  // Function to toggle full-screen mode
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
-      roomRef.current?.requestFullscreen();
+      document.documentElement.requestFullscreen().catch(console.error);
       setIsFullScreen(true);
     } else {
-      document.exitFullscreen();
+      document.exitFullscreen().catch(console.error);
       setIsFullScreen(false);
     }
   };
@@ -62,15 +60,11 @@ const MeetingRoom = () => {
   };
 
   return (
-    <section
-      ref={roomRef}
-      className="relative h-screen w-full overflow-hidden pt-4 text-white"
-    >
+    <section className="relative h-screen w-full overflow-hidden pt-4 text-white">
       <div className="relative flex size-full items-center justify-center">
-        <div className="flex size-full max-w-full items-center">
+        <div className="flex size-full max-w-[1000px] items-center">
           <CallLayout />
         </div>
-        {/* Participants List */}
         <div
           className={cn('h-[calc(100vh-86px)] hidden ml-2', {
             'show-block': showParticipants,
@@ -84,7 +78,7 @@ const MeetingRoom = () => {
       <div className="fixed bottom-0 flex w-full items-center justify-center gap-5">
         <CallControls onLeave={() => router.push(`/`)} />
 
-        {/* Layout Dropdown */}
+        {/* Layout Change Dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
             <LayoutList size={20} className="text-white" />
@@ -93,9 +87,7 @@ const MeetingRoom = () => {
             {['Grid', 'Speaker-Left', 'Speaker-Right'].map((item, index) => (
               <div key={index}>
                 <DropdownMenuItem
-                  onClick={() =>
-                    setLayout(item.toLowerCase() as CallLayoutType)
-                  }
+                  onClick={() => setLayout(item.toLowerCase() as CallLayoutType)}
                 >
                   {item}
                 </DropdownMenuItem>
@@ -105,24 +97,28 @@ const MeetingRoom = () => {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Call Stats */}
+        {/* Call Stats Button */}
         <CallStatsButton />
 
-        {/* Show Participants Button */}
+        {/* Toggle Participants Panel */}
         <button onClick={() => setShowParticipants((prev) => !prev)}>
           <div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
             <Users size={20} className="text-white" />
           </div>
         </button>
 
-        {/* Full Screen Button */}
+        {/* Full-Screen Toggle Button */}
         <button onClick={toggleFullScreen}>
           <div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
-            <Expand size={20} className="text-white" />
+            {isFullScreen ? (
+              <Minimize size={20} className="text-white" />
+            ) : (
+              <Maximize size={20} className="text-white" />
+            )}
           </div>
         </button>
 
-        {/* End Call Button (if not personal room) */}
+        {/* End Call Button (if not a personal room) */}
         {!isPersonalRoom && <EndCallButton />}
       </div>
     </section>
