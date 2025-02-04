@@ -11,7 +11,6 @@ import {
 } from '@stream-io/video-react-sdk';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Users, LayoutList, Maximize, Minimize } from 'lucide-react';
-import { cn } from '@/lib/utils';
 
 
 import {
