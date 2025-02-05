@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   CallControls,
   CallParticipantsList,
@@ -31,11 +31,18 @@ const MeetingRoom = () => {
   const router = useRouter();
   const [layout, setLayout] = useState<CallLayoutType>('speaker-left');
   const [showParticipants, setShowParticipants] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isClient, setIsClient] = useState(false); // Track if we are in client-side environment
   const { useCallCallingState } = useCallStateHooks();
 
   const callingState = useCallCallingState();
 
-  if (callingState !== CallingState.JOINED) return <Loader />;
+  useEffect(() => {
+    // Ensure the fullscreen-related code runs only on the client
+    setIsClient(true);
+  }, []);
+
+  if (callingState !== CallingState.JOINED || !isClient) return <Loader />;
 
   const CallLayout = () => {
     switch (layout) {
@@ -48,15 +55,57 @@ const MeetingRoom = () => {
     }
   };
 
-  // Mobile-specific fullscreen: targeting the video container element
-  const toggleMobileFullScreen = () => {
+  // Handle fullscreen changes
+  const handleFullscreenChange = () => {
+    if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement) {
+      setIsFullscreen(true);
+    } else {
+      setIsFullscreen(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isClient) return;
+    
+    // Add event listener for fullscreen changes
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+    // Clean up event listeners on component unmount
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('MSFullscreenChange', handleFullscreenChange);
+    };
+  }, [isClient]);
+
+  const toggleFullScreen = () => {
+    if (!isClient) return;
+
     const videoContainer = document.getElementById('video-container');
     if (videoContainer) {
-      if (!document.fullscreenElement) {
-        videoContainer.requestFullscreen();
+      if (!document.fullscreenElement && !document.webkitFullscreenElement && !document.mozFullScreenElement && !document.msFullscreenElement) {
+        if (videoContainer.requestFullscreen) {
+          videoContainer.requestFullscreen();
+        } else if (videoContainer.webkitRequestFullscreen) {
+          videoContainer.webkitRequestFullscreen();
+        } else if (videoContainer.mozRequestFullScreen) {
+          videoContainer.mozRequestFullScreen();
+        } else if (videoContainer.msRequestFullscreen) {
+          videoContainer.msRequestFullscreen();
+        }
       } else {
         if (document.exitFullscreen) {
           document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
         }
       }
     }
@@ -77,7 +126,11 @@ const MeetingRoom = () => {
         </div>
       </div>
       {/* video layout and call controls */}
-      <div className="fixed bottom-0 flex w-full items-center justify-center gap-5 overflow-x-auto scroll-smooth py-2">
+      <div
+        className={cn('fixed bottom-0 flex w-full items-center justify-center gap-5 overflow-x-auto scroll-smooth py-2', {
+          'hidden': isFullscreen, // Hide buttons when fullscreen is active
+        })}
+      >
         <CallControls onLeave={() => router.push(`/`)} />
         <DropdownMenu>
           <div className="flex items-center">
@@ -106,7 +159,7 @@ const MeetingRoom = () => {
             <Users size={20} className="text-white" />
           </div>
         </button>
-        <button onClick={toggleMobileFullScreen}>
+        <button onClick={toggleFullScreen}>
           <div className=" cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b] ">
             <Maximize2 size={20} className="text-white" />
           </div>
