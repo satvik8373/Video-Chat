@@ -1,119 +1,188 @@
-"use client";
-import { useState, useEffect, ReactNode } from "react";
-import { Dialog, DialogContent } from "./ui/dialog";
-import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
-import Image from "next/image";
+'use client';
+import { useState, useEffect, useRef } from 'react';
+import {
+  CallControls,
+  CallParticipantsList,
+  CallStatsButton,
+  CallingState,
+  PaginatedGridLayout,
+  SpeakerLayout,
+  useCallStateHooks,
+} from '@stream-io/video-react-sdk';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Users, LayoutList, Maximize2 } from 'lucide-react'; // Import Maximize2 for fullscreen icon
 
-interface MeetingModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  className?: string;
-  children?: ReactNode;
-  handleClick?: () => void;
-  buttonText?: string;
-  instantMeeting?: boolean;
-  image?: string;
-  buttonClassName?: string;
-  buttonIcon?: string;
-  numParticipants?: number;
-  adminCount?: number;
-  layoutPreference?: string;
-  screenSize?: string;
-}
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
+import Loader from './Loader';
+import EndCallButton from './EndCallButton';
+import { cn } from '@/lib/utils';
 
-const MeetingModal = ({
-  isOpen = false,
-  onClose = () => {},
-  title = "Meeting Modal",
-  className,
-  children,
-  handleClick,
-  buttonText,
-  image,
-  buttonClassName,
-  buttonIcon,
-  numParticipants = 1,
-  adminCount = 0,
-  layoutPreference = "grid",
-  screenSize = "medium",
-}: MeetingModalProps) => {
-  const [isFullScreen, setIsFullScreen] = useState(false);
+const layouts = ['grid', 'speaker-left', 'speaker-right', 'split-screen'];
 
-  const toggleFullScreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch((err) => {
-        console.error("Error attempting to enable full-screen mode:", err);
-      });
-      setIsFullScreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullScreen(false);
+const MeetingRoom = ({ numParticipants, adminCount, layoutPreference, screenSize }) => {
+  const searchParams = useSearchParams();
+  const isPersonalRoom = !!searchParams.get('personal');
+  const router = useRouter();
+  const [layout, setLayout] = useState(layoutPreference || 'grid');
+  const [showParticipants, setShowParticipants] = useState(false);
+  const { useCallCallingState } = useCallStateHooks();
+  const callingState = useCallCallingState();
+  const meetingRef = useRef(null);
+
+  // Fullscreen state to check if we're in fullscreen
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  // Fullscreen logic for mobile and desktop browsers
+  const enterFullscreen = () => {
+    if (meetingRef.current) {
+      if (meetingRef.current.requestFullscreen) {
+        meetingRef.current.requestFullscreen();
+      } else if (meetingRef.current.mozRequestFullScreen) { // Firefox
+        meetingRef.current.mozRequestFullScreen();
+      } else if (meetingRef.current.webkitRequestFullscreen) { // Safari
+        meetingRef.current.webkitRequestFullscreen();
+      } else if (meetingRef.current.msRequestFullscreen) { // IE
+        meetingRef.current.msRequestFullscreen();
+      }
+      setIsFullscreen(true);
     }
   };
 
+  const exitFullscreen = () => {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.mozCancelFullScreen) { // Firefox
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) { // Safari
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { // IE
+      document.msExitFullscreen();
+    }
+    setIsFullscreen(false);
+  };
+
+  // Check for fullscreen state change
   useEffect(() => {
     const handleFullscreenChange = () => {
-      setIsFullScreen(!!document.fullscreenElement);
+      if (
+        document.fullscreenElement ||
+        document.webkitFullscreenElement ||
+        document.mozFullScreenElement ||
+        document.msFullscreenElement
+      ) {
+        setIsFullscreen(true);
+      } else {
+        setIsFullscreen(false);
+      }
     };
 
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+    document.addEventListener('msfullscreenchange', handleFullscreenChange);
+
+    // If we have the room with many participants, adjust layout automatically
+    if (numParticipants > 6) {
+      setLayout('grid');
+    } else if (adminCount > 1) {
+      setLayout('split-screen');
+    }
+
+    // Fullscreen logic when app opens in mobile Safari (add to home screen)
+    if (window.navigator.standalone) {
+      enterFullscreen();
+    }
+
     return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
+      document.removeEventListener('msfullscreenchange', handleFullscreenChange);
     };
-  }, []);
+  }, [numParticipants, adminCount]);
+
+  const toggleFullscreen = () => {
+    if (isFullscreen) {
+      // Exit fullscreen if already in fullscreen
+      exitFullscreen();
+    } else {
+      // Enter fullscreen if not in fullscreen
+      enterFullscreen();
+    }
+  };
+
+  if (callingState !== CallingState.JOINED) return <Loader />;
+
+  const CallLayout = () => {
+    switch (layout) {
+      case 'grid':
+        return <PaginatedGridLayout className="h-full w-full m-0 p-0" />;
+      case 'speaker-right':
+        return <SpeakerLayout participantsBarPosition="left" className="h-full w-full m-0 p-0" />;
+      case 'split-screen':
+        return (
+          <div className="grid grid-cols-2 gap-0 h-full w-full m-0 p-0">
+            <SpeakerLayout participantsBarPosition="left" className="h-full w-full m-0 p-0" />
+            <SpeakerLayout participantsBarPosition="right" className="h-full w-full m-0 p-0" />
+          </div>
+        );
+      default:
+        return <SpeakerLayout participantsBarPosition="right" className="h-full w-full m-0 p-0" />;
+    }
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent
-        className={cn(
-          "flex w-full max-w-[1024px] flex-col gap-6 border-none bg-dark-1 px-6 py-9 text-white",
-          isFullScreen ? "w-screen h-screen max-w-none" : ""
-        )}
-      >
-        <div className="flex flex-col gap-6 items-center text-center w-full h-full">
-          {image && (
-            <div className="flex justify-center">
-              <Image src={image} alt="checked" width={72} height={72} />
-            </div>
-          )}
-          <h1 className={cn("text-3xl font-bold leading-[42px]", className)}>
-            {title}
-          </h1>
-          <div className="w-full flex-grow flex items-center justify-center">
-            {children}
-          </div>
-          <div className="flex flex-wrap gap-4 justify-center w-full">
-            <Button
-              className={cn(
-                "bg-blue-1 focus-visible:ring-0 focus-visible:ring-offset-0",
-                buttonClassName
-              )}
-              onClick={handleClick}
-            >
-              {buttonIcon && (
-                <Image
-                  src={buttonIcon}
-                  alt="button icon"
-                  width={13}
-                  height={13}
-                />
-              )} 
-              &nbsp;
-              {buttonText || "Schedule Meeting"}
-            </Button>
-            <Button
-              className="bg-gray-700 focus-visible:ring-0 focus-visible:ring-offset-0"
-              onClick={toggleFullScreen}
-            >
-              {isFullScreen ? "Exit Full Screen" : "Full Screen"}
-            </Button>
-          </div>
+    <section className="relative h-screen w-screen overflow-hidden text-white m-0 p-0" ref={meetingRef}>
+      <div className="relative flex size-full items-center justify-center m-0 p-0">
+        <div className="flex size-full max-w-full items-center m-0 p-0">
+          <CallLayout />
         </div>
-      </DialogContent>
-    </Dialog>
+        <div
+          className={cn('h-[calc(100vh-86px)] hidden ml-0', {
+            'show-block': showParticipants,
+          })}
+        >
+          <CallParticipantsList onClose={() => setShowParticipants(false)} />
+        </div>
+      </div>
+      <div className="fixed bottom-0 flex w-full items-center justify-center gap-5 m-0 p-0">
+        <CallControls onLeave={() => router.push(`/`)} />
+        <DropdownMenu>
+          <div className="flex items-center">
+            <DropdownMenuTrigger className="cursor-pointer rounded-2xl bg-[#19232d] hover:bg-[#4c535b] m-0 p-0">
+              <LayoutList size={20} className="text-white" />
+            </DropdownMenuTrigger>
+          </div>
+          <DropdownMenuContent className="border-dark-1 bg-dark-1 text-white m-0 p-0">
+            {layouts.map((item, index) => (
+              <div key={index}>
+                <DropdownMenuItem onClick={() => setLayout(item)}>
+                  {item.replace('-', ' ')}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="border-dark-1" />
+              </div>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <CallStatsButton />
+        <button onClick={() => setShowParticipants((prev) => !prev)}>
+          <div className="cursor-pointer rounded-2xl bg-[#19232d] hover:bg-[#4c535b] m-0 p-0">
+            <Users size={20} className="text-white" />
+          </div>
+        </button>
+        <button onClick={toggleFullscreen} className="cursor-pointer rounded-2xl bg-[#19232d] hover:bg-[#4c535b] m-0 p-0">
+          <Maximize2 size={20} className="text-white" />
+        </button>
+        {!isPersonalRoom && <EndCallButton />}
+      </div>
+    </section>
   );
 };
 
-export default MeetingModal;
+export default MeetingRoom;
