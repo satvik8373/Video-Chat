@@ -33,6 +33,9 @@ const MeetingRoom = () => {
   const [showParticipants, setShowParticipants] = useState(false);
   const { useCallCallingState } = useCallStateHooks();
 
+  // Fullscreen state
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   // for more detail about types of CallingState see: https://getstream.io/video/docs/react/ui-cookbook/ringing-call/#incoming-call-panel
   const callingState = useCallCallingState();
 
@@ -46,6 +49,31 @@ const MeetingRoom = () => {
         return <SpeakerLayout participantsBarPosition="left" />;
       default:
         return <SpeakerLayout participantsBarPosition="right" />;
+    }
+  };
+
+  const toggleFullScreen = () => {
+    if (!isFullscreen) {
+      // Try to enter fullscreen mode
+      const doc = document.documentElement;
+      if (doc.requestFullscreen) {
+        doc.requestFullscreen();
+      } else if (doc.webkitRequestFullscreen) { // Safari
+        doc.webkitRequestFullscreen();
+      } else if (doc.msRequestFullscreen) { // IE
+        doc.msRequestFullscreen();
+      }
+      setIsFullscreen(true);
+    } else {
+      // Exit fullscreen mode
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) { // Safari
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) { // IE
+        document.msExitFullscreen();
+      }
+      setIsFullscreen(false);
     }
   };
 
@@ -63,7 +91,8 @@ const MeetingRoom = () => {
           <CallParticipantsList onClose={() => setShowParticipants(false)} />
         </div>
       </div>
-      {/* video layout and call controls */}
+
+      {/* Fullscreen and Call Layout */}
       <div className="fixed bottom-0 flex w-full items-center justify-center gap-5">
         <CallControls onLeave={() => router.push(`/`)} />
 
@@ -90,10 +119,18 @@ const MeetingRoom = () => {
         </DropdownMenu>
         <CallStatsButton />
         <button onClick={() => setShowParticipants((prev) => !prev)}>
-          <div className=" cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]  ">
+          <div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
             <Users size={20} className="text-white" />
           </div>
         </button>
+
+        {/* Fullscreen Toggle Button */}
+        <button onClick={toggleFullScreen}>
+          <div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
+            {isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+          </div>
+        </button>
+
         {!isPersonalRoom && <EndCallButton />}
       </div>
     </section>
