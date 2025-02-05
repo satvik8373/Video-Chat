@@ -48,16 +48,6 @@ const MeetingRoom = () => {
     }
   };
 
-  const toggleFullScreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      }
-    }
-  };
-
   // Mobile-specific fullscreen: targeting the video container element
   const toggleMobileFullScreen = () => {
     const videoContainer = document.getElementById('video-container');
