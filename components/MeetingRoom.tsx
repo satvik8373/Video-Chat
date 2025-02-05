@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   CallControls,
   CallParticipantsList,
@@ -23,65 +23,72 @@ import Loader from './Loader';
 import EndCallButton from './EndCallButton';
 import { cn } from '@/lib/utils';
 
-type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
+const layouts = ['grid', 'speaker-left', 'speaker-right', 'split-screen'];
 
-const MeetingRoom = () => {
+const MeetingRoom = ({ numParticipants, adminCount, layoutPreference, screenSize }) => {
   const searchParams = useSearchParams();
   const isPersonalRoom = !!searchParams.get('personal');
   const router = useRouter();
-  const [layout, setLayout] = useState<CallLayoutType>('speaker-left');
+  const [layout, setLayout] = useState(layoutPreference || 'grid');
   const [showParticipants, setShowParticipants] = useState(false);
   const { useCallCallingState } = useCallStateHooks();
-
-  // for more detail about types of CallingState see: https://getstream.io/video/docs/react/ui-cookbook/ringing-call/#incoming-call-panel
   const callingState = useCallCallingState();
+
+  useEffect(() => {
+    if (numParticipants > 6) {
+      setLayout('grid');
+    } else if (adminCount > 1) {
+      setLayout('split-screen');
+    }
+  }, [numParticipants, adminCount]);
 
   if (callingState !== CallingState.JOINED) return <Loader />;
 
   const CallLayout = () => {
     switch (layout) {
       case 'grid':
-        return <PaginatedGridLayout />;
+        return <PaginatedGridLayout className="h-full w-full m-0 p-0" />;
       case 'speaker-right':
-        return <SpeakerLayout participantsBarPosition="left" />;
+        return <SpeakerLayout participantsBarPosition="left" className="h-full w-full m-0 p-0" />;
+      case 'split-screen':
+        return (
+          <div className="grid grid-cols-2 gap-0 h-full w-full m-0 p-0">
+            <SpeakerLayout participantsBarPosition="left" className="h-full w-full m-0 p-0" />
+            <SpeakerLayout participantsBarPosition="right" className="h-full w-full m-0 p-0" />
+          </div>
+        );
       default:
-        return <SpeakerLayout participantsBarPosition="right" />;
+        return <SpeakerLayout participantsBarPosition="right" className="h-full w-full m-0 p-0" />;
     }
   };
 
   return (
-    <section className="relative h-screen w-full overflow-hidden pt-4 text-white">
-      <div className="relative flex size-full items-center justify-center">
-        <div className=" flex size-full max-w-[1000px] items-center">
+    <section className="relative h-screen w-screen overflow-hidden text-white m-0 p-0">
+      <div className="relative flex size-full items-center justify-center m-0 p-0">
+        <div className="flex size-full max-w-full items-center m-0 p-0">
           <CallLayout />
         </div>
         <div
-          className={cn('h-[calc(100vh-86px)] hidden ml-2', {
+          className={cn('h-[calc(100vh-86px)] hidden ml-0', {
             'show-block': showParticipants,
           })}
         >
           <CallParticipantsList onClose={() => setShowParticipants(false)} />
         </div>
       </div>
-      {/* video layout and call controls */}
-      <div className="fixed bottom-0 flex w-full items-center justify-center gap-5">
+      <div className="fixed bottom-0 flex w-full items-center justify-center gap-5 m-0 p-0">
         <CallControls onLeave={() => router.push(`/`)} />
-
         <DropdownMenu>
           <div className="flex items-center">
-            <DropdownMenuTrigger className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]  ">
+            <DropdownMenuTrigger className="cursor-pointer rounded-2xl bg-[#19232d] hover:bg-[#4c535b] m-0 p-0">
               <LayoutList size={20} className="text-white" />
             </DropdownMenuTrigger>
           </div>
-          <DropdownMenuContent className="border-dark-1 bg-dark-1 text-white">
-            {['Grid', 'Speaker-Left', 'Speaker-Right'].map((item, index) => (
+          <DropdownMenuContent className="border-dark-1 bg-dark-1 text-white m-0 p-0">
+            {layouts.map((item, index) => (
               <div key={index}>
-                <DropdownMenuItem
-                  onClick={() =>
-                    setLayout(item.toLowerCase() as CallLayoutType)
-                  }
-                >
-                  {item}
+                <DropdownMenuItem onClick={() => setLayout(item)}>
+                  {item.replace('-', ' ')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator className="border-dark-1" />
               </div>
@@ -90,7 +97,7 @@ const MeetingRoom = () => {
         </DropdownMenu>
         <CallStatsButton />
         <button onClick={() => setShowParticipants((prev) => !prev)}>
-          <div className=" cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]  ">
+          <div className="cursor-pointer rounded-2xl bg-[#19232d] hover:bg-[#4c535b] m-0 p-0">
             <Users size={20} className="text-white" />
           </div>
         </button>
