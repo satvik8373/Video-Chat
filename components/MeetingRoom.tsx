@@ -55,11 +55,11 @@ const MeetingRoom = () => {
   const toggleFullScreen = () => {
     if (!isFullscreen) {
       // Try to enter fullscreen mode
-      const doc = document.documentElement as HTMLElement; // Type casting to HTMLElement
+      const doc = document.documentElement;
       if (doc.requestFullscreen) {
         doc.requestFullscreen();
       } else if (doc.webkitRequestFullscreen) { // Safari
-        doc.webkitRequestFullscreen(); // No need for casting to `any` after augmenting HTMLElement
+        doc.webkitRequestFullscreen();
       } else if (doc.msRequestFullscreen) { // IE
         doc.msRequestFullscreen();
       }
@@ -69,7 +69,7 @@ const MeetingRoom = () => {
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if (document.webkitExitFullscreen) { // Safari
-        document.webkitExitFullscreen(); // No need for casting to `any` after augmenting HTMLElement
+        document.webkitExitFullscreen();
       } else if (document.msExitFullscreen) { // IE
         document.msExitFullscreen();
       }
