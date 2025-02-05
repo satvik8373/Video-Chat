@@ -57,11 +57,11 @@ const MeetingRoom = () => {
       // Try to enter fullscreen mode
       const doc = document.documentElement;
       if (doc.requestFullscreen) {
-        doc.requestFullscreen();
+        (doc as any).requestFullscreen();
       } else if (doc.webkitRequestFullscreen) { // Safari
-        doc.webkitRequestFullscreen();
+        (doc as any).webkitRequestFullscreen(); // Type assertion to `any`
       } else if (doc.msRequestFullscreen) { // IE
-        doc.msRequestFullscreen();
+        (doc as any).msRequestFullscreen();
       }
       setIsFullscreen(true);
     } else {
@@ -69,9 +69,9 @@ const MeetingRoom = () => {
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if (document.webkitExitFullscreen) { // Safari
-        document.webkitExitFullscreen();
+        (document as any).webkitExitFullscreen(); // Type assertion to `any`
       } else if (document.msExitFullscreen) { // IE
-        document.msExitFullscreen();
+        (document as any).msExitFullscreen();
       }
       setIsFullscreen(false);
     }
