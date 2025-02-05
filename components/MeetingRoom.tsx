@@ -59,7 +59,7 @@ const MeetingRoom = () => {
       if (doc.requestFullscreen) {
         doc.requestFullscreen();
       } else if (doc.webkitRequestFullscreen) { // Safari
-        (doc as any).webkitRequestFullscreen(); // Cast to `any` for webkit-specific method
+        doc.webkitRequestFullscreen(); // No need for casting to `any` after augmenting HTMLElement
       } else if (doc.msRequestFullscreen) { // IE
         doc.msRequestFullscreen();
       }
@@ -69,7 +69,7 @@ const MeetingRoom = () => {
       if (document.exitFullscreen) {
         document.exitFullscreen();
       } else if (document.webkitExitFullscreen) { // Safari
-        (document as any).webkitExitFullscreen(); // Cast to `any` for webkit-specific method
+        document.webkitExitFullscreen(); // No need for casting to `any` after augmenting HTMLElement
       } else if (document.msExitFullscreen) { // IE
         document.msExitFullscreen();
       }
