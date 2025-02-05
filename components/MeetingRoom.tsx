@@ -10,7 +10,7 @@ import {
   useCallStateHooks,
 } from '@stream-io/video-react-sdk';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Users, LayoutList, Maximize2 } from 'lucide-react'; // Added Maximize2 for fullscreen icon
+import { Users, LayoutList, Maximize2 } from 'lucide-react'; // Import Maximize2 for full-screen icon
 
 import {
   DropdownMenu,
@@ -33,6 +33,7 @@ const MeetingRoom = () => {
   const [showParticipants, setShowParticipants] = useState(false);
   const { useCallCallingState } = useCallStateHooks();
 
+  // for more detail about types of CallingState see: https://getstream.io/video/docs/react/ui-cookbook/ringing-call/#incoming-call-panel
   const callingState = useCallCallingState();
 
   if (callingState !== CallingState.JOINED) return <Loader />;
@@ -48,27 +49,12 @@ const MeetingRoom = () => {
     }
   };
 
-  const toggleFullscreen = () => {
-    const docEl = document.documentElement;
+  const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
-      if (docEl.requestFullscreen) {
-        docEl.requestFullscreen();
-      } else if (docEl.mozRequestFullScreen) { // Firefox
-        docEl.mozRequestFullScreen();
-      } else if (docEl.webkitRequestFullscreen) { // Chrome, Safari and Opera
-        docEl.webkitRequestFullscreen();
-      } else if (docEl.msRequestFullscreen) { // IE/Edge
-        docEl.msRequestFullscreen();
-      }
+      document.documentElement.requestFullscreen();
     } else {
       if (document.exitFullscreen) {
         document.exitFullscreen();
-      } else if (document.mozCancelFullScreen) { // Firefox
-        document.mozCancelFullScreen();
-      } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) { // IE/Edge
-        document.msExitFullscreen();
       }
     }
   };
@@ -114,12 +100,12 @@ const MeetingRoom = () => {
         </DropdownMenu>
         <CallStatsButton />
         <button onClick={() => setShowParticipants((prev) => !prev)}>
-          <div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
+          <div className=" cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]  ">
             <Users size={20} className="text-white" />
           </div>
         </button>
-        <button onClick={toggleFullscreen}>
-          <div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
+        <button onClick={toggleFullScreen}>
+          <div className=" cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]  ">
             <Maximize2 size={20} className="text-white" />
           </div>
         </button>
