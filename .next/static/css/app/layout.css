@@ -598,6 +598,9 @@ video {
 .ml-auto {
   margin-left: auto;
 }
+.ml-2 {
+  margin-left: 0.5rem;
+}
 .flex {
   display: flex;
 }
@@ -728,6 +731,9 @@ video {
 }
 .max-w-lg {
   max-width: 32rem;
+}
+.max-w-\[1000px\] {
+  max-width: 1000px;
 }
 .flex-1 {
   flex: 1 1 0%;
@@ -1072,6 +1078,9 @@ video {
 }
 .pt-28 {
   padding-top: 7rem;
+}
+.pt-4 {
+  padding-top: 1rem;
 }
 .text-center {
   text-align: center;
