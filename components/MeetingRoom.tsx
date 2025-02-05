@@ -24,9 +24,9 @@ interface MeetingModalProps {
 }
 
 const MeetingModal = ({
-  isOpen,
-  onClose,
-  title,
+  isOpen = false,
+  onClose = () => {},
+  title = "Meeting Modal",
   className,
   children,
   handleClick,
