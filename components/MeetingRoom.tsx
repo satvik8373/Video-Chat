@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect, useRef } from 'react';
 import {
   CallControls,
@@ -25,13 +26,6 @@ import { cn } from '@/lib/utils';
 
 const layouts = ['grid', 'speaker-left', 'speaker-right', 'split-screen'];
 
-interface MeetingRoomProps {
-  numParticipants: number;
-  adminCount: number;
-  layoutPreference: string;
-  screenSize: string;
-}
-
 const MeetingRoom: React.FC<MeetingRoomProps> = ({
   numParticipants,
   adminCount,
@@ -45,81 +39,34 @@ const MeetingRoom: React.FC<MeetingRoomProps> = ({
   const [showParticipants, setShowParticipants] = useState(false);
   const { useCallCallingState } = useCallStateHooks();
   const callingState = useCallCallingState();
-  const meetingRef = useRef(null);
-
   const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // Handle fullscreen logic
-  const enterFullscreen = () => {
-    if (meetingRef.current) {
-      if (meetingRef.current.requestFullscreen) {
-        meetingRef.current.requestFullscreen();
-      } else if (meetingRef.current.mozRequestFullScreen) {
-        meetingRef.current.mozRequestFullScreen();
-      } else if (meetingRef.current.webkitRequestFullscreen) {
-        meetingRef.current.webkitRequestFullscreen();
-      } else if (meetingRef.current.msRequestFullscreen) {
-        meetingRef.current.msRequestFullscreen();
-      }
-      setIsFullscreen(true);
-    }
-  };
-
-  const exitFullscreen = () => {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document.mozCancelFullScreen) {
-      document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) {
-      document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) {
-      document.msExitFullscreen();
-    }
-    setIsFullscreen(false);
-  };
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const handleFullscreenChange = () => {
-      if (
-        document.fullscreenElement ||
-        document.webkitFullscreenElement ||
-        document.mozFullScreenElement ||
-        document.msFullscreenElement
-      ) {
-        setIsFullscreen(true);
-      } else {
-        setIsFullscreen(false);
-      }
-    };
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
-    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
-    document.addEventListener('msfullscreenchange', handleFullscreenChange);
-
     if (numParticipants > 6) {
       setLayout('grid');
     } else if (adminCount > 1) {
       setLayout('split-screen');
     }
-
-    if (window.navigator.standalone) {
-      enterFullscreen();
-    }
-
-    return () => {
-      document.removeEventListener('fullscreenchange', handleFullscreenChange);
-      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange);
-      document.removeEventListener('mozfullscreenchange', handleFullscreenChange);
-      document.removeEventListener('msfullscreenchange', handleFullscreenChange);
-    };
   }, [numParticipants, adminCount]);
 
   const toggleFullscreen = () => {
-    if (isFullscreen) {
-      exitFullscreen();
-    } else {
-      enterFullscreen();
+    if (containerRef.current) {
+      if (!isFullscreen) {
+        if (containerRef.current.requestFullscreen) {
+          containerRef.current.requestFullscreen();
+        } else if (containerRef.current.mozRequestFullScreen) { // Firefox
+          containerRef.current.mozRequestFullScreen();
+        } else if (containerRef.current.webkitRequestFullscreen) { // Chrome, Safari
+          containerRef.current.webkitRequestFullscreen();
+        } else if (containerRef.current.msRequestFullscreen) { // IE/Edge
+          containerRef.current.msRequestFullscreen();
+        }
+        setIsFullscreen(true);
+      } else {
+        document.exitFullscreen();
+        setIsFullscreen(false);
+      }
     }
   };
 
@@ -128,44 +75,44 @@ const MeetingRoom: React.FC<MeetingRoomProps> = ({
   const CallLayout = () => {
     switch (layout) {
       case 'grid':
-        return <PaginatedGridLayout className="h-full w-full m-0 p-0" />;
+        return <PaginatedGridLayout className="size-full m-0 p-0" />;
       case 'speaker-right':
-        return <SpeakerLayout participantsBarPosition="left" className="h-full w-full m-0 p-0" />;
+        return <SpeakerLayout participantsBarPosition="left" className="size-full m-0 p-0" />;
       case 'split-screen':
         return (
-          <div className="grid grid-cols-2 gap-0 h-full w-full m-0 p-0">
-            <SpeakerLayout participantsBarPosition="left" className="h-full w-full m-0 p-0" />
-            <SpeakerLayout participantsBarPosition="right" className="h-full w-full m-0 p-0" />
+          <div className="grid grid-cols-2 gap-0 size-full m-0 p-0">
+            <SpeakerLayout participantsBarPosition="left" className="size-full m-0 p-0" />
+            <SpeakerLayout participantsBarPosition="right" className="size-full m-0 p-0" />
           </div>
         );
       default:
-        return <SpeakerLayout participantsBarPosition="right" className="h-full w-full m-0 p-0" />;
+        return <SpeakerLayout participantsBarPosition="right" className="size-full m-0 p-0" />;
     }
   };
 
   return (
-    <section className="relative h-screen w-screen overflow-hidden text-white m-0 p-0" ref={meetingRef}>
-      <div className="relative flex size-full items-center justify-center m-0 p-0">
-        <div className="flex size-full max-w-full items-center m-0 p-0">
+    <section ref={containerRef} className="relative size-full overflow-hidden text-white">
+      <div className="flex size-full items-center justify-center">
+        <div className="flex size-full max-w-full items-center">
           <CallLayout />
         </div>
         <div
-          className={cn('h-[calc(100vh-86px)] hidden ml-0', {
+          className={cn('size-full hidden ml-0', {
             'show-block': showParticipants,
           })}
         >
           <CallParticipantsList onClose={() => setShowParticipants(false)} />
         </div>
       </div>
-      <div className="fixed bottom-0 flex w-full items-center justify-center gap-5 m-0 p-0">
+      <div className="fixed bottom-0 flex w-full items-center justify-center gap-5">
         <CallControls onLeave={() => router.push(`/`)} />
         <DropdownMenu>
           <div className="flex items-center">
-            <DropdownMenuTrigger className="cursor-pointer rounded-2xl bg-[#19232d] hover:bg-[#4c535b] m-0 p-0">
+            <DropdownMenuTrigger className="cursor-pointer rounded-2xl bg-[#19232d] hover:bg-[#4c535b]">
               <LayoutList size={20} className="text-white" />
             </DropdownMenuTrigger>
           </div>
-          <DropdownMenuContent className="border-dark-1 bg-dark-1 text-white m-0 p-0">
+          <DropdownMenuContent className="border-dark-1 bg-dark-1 text-white">
             {layouts.map((item, index) => (
               <div key={index}>
                 <DropdownMenuItem onClick={() => setLayout(item)}>
@@ -178,14 +125,16 @@ const MeetingRoom: React.FC<MeetingRoomProps> = ({
         </DropdownMenu>
         <CallStatsButton />
         <button onClick={() => setShowParticipants((prev) => !prev)}>
-          <div className="cursor-pointer rounded-2xl bg-[#19232d] hover:bg-[#4c535b] m-0 p-0">
+          <div className="cursor-pointer rounded-2xl bg-[#19232d] hover:bg-[#4c535b]">
             <Users size={20} className="text-white" />
           </div>
         </button>
-        <button onClick={toggleFullscreen} className="cursor-pointer rounded-2xl bg-[#19232d] hover:bg-[#4c535b] m-0 p-0">
-          <Maximize2 size={20} className="text-white" />
-        </button>
         {!isPersonalRoom && <EndCallButton />}
+        <button onClick={toggleFullscreen}>
+          <div className="cursor-pointer rounded-2xl bg-[#19232d] hover:bg-[#4c535b]">
+            <Maximize2 size={20} className="text-white" />
+          </div>
+        </button>
       </div>
     </section>
   );
