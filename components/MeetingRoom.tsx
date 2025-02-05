@@ -10,7 +10,7 @@ import {
   useCallStateHooks,
 } from '@stream-io/video-react-sdk';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Users, LayoutList } from 'lucide-react';
+import { Users, LayoutList, Maximize2 } from 'lucide-react'; // Added Maximize2 for fullscreen icon
 
 import {
   DropdownMenu,
@@ -33,10 +33,6 @@ const MeetingRoom = () => {
   const [showParticipants, setShowParticipants] = useState(false);
   const { useCallCallingState } = useCallStateHooks();
 
-  // Fullscreen state
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // for more detail about types of CallingState see: https://getstream.io/video/docs/react/ui-cookbook/ringing-call/#incoming-call-panel
   const callingState = useCallCallingState();
 
   if (callingState !== CallingState.JOINED) return <Loader />;
@@ -52,28 +48,28 @@ const MeetingRoom = () => {
     }
   };
 
-  const toggleFullScreen = () => {
-    if (!isFullscreen) {
-      // Try to enter fullscreen mode
-      const doc = document.documentElement;
-      if (doc.requestFullscreen) {
-        (doc as any).requestFullscreen();
-      } else if (doc.webkitRequestFullscreen) { // Safari
-        (doc as any).webkitRequestFullscreen(); // Type assertion to `any`
-      } else if (doc.msRequestFullscreen) { // IE
-        (doc as any).msRequestFullscreen();
+  const toggleFullscreen = () => {
+    const docEl = document.documentElement;
+    if (!document.fullscreenElement) {
+      if (docEl.requestFullscreen) {
+        docEl.requestFullscreen();
+      } else if (docEl.mozRequestFullScreen) { // Firefox
+        docEl.mozRequestFullScreen();
+      } else if (docEl.webkitRequestFullscreen) { // Chrome, Safari and Opera
+        docEl.webkitRequestFullscreen();
+      } else if (docEl.msRequestFullscreen) { // IE/Edge
+        docEl.msRequestFullscreen();
       }
-      setIsFullscreen(true);
     } else {
-      // Exit fullscreen mode
       if (document.exitFullscreen) {
         document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) { // Safari
-        (document as any).webkitExitFullscreen(); // Type assertion to `any`
-      } else if (document.msExitFullscreen) { // IE
-        (document as any).msExitFullscreen();
+      } else if (document.mozCancelFullScreen) { // Firefox
+        document.mozCancelFullScreen();
+      } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) { // IE/Edge
+        document.msExitFullscreen();
       }
-      setIsFullscreen(false);
     }
   };
 
@@ -91,8 +87,7 @@ const MeetingRoom = () => {
           <CallParticipantsList onClose={() => setShowParticipants(false)} />
         </div>
       </div>
-
-      {/* Fullscreen and Call Layout */}
+      {/* video layout and call controls */}
       <div className="fixed bottom-0 flex w-full items-center justify-center gap-5">
         <CallControls onLeave={() => router.push(`/`)} />
 
@@ -123,14 +118,11 @@ const MeetingRoom = () => {
             <Users size={20} className="text-white" />
           </div>
         </button>
-
-        {/* Fullscreen Toggle Button */}
-        <button onClick={toggleFullScreen}>
+        <button onClick={toggleFullscreen}>
           <div className="cursor-pointer rounded-2xl bg-[#19232d] px-4 py-2 hover:bg-[#4c535b]">
-            {isFullscreen ? 'Exit Full Screen' : 'Enter Full Screen'}
+            <Maximize2 size={20} className="text-white" />
           </div>
         </button>
-
         {!isPersonalRoom && <EndCallButton />}
       </div>
     </section>
