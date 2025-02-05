@@ -148,4 +148,12 @@ const MeetingRoom: React.FC<MeetingRoomProps> = ({
   );
 };
 
+// Default props to ensure it's always receiving the required data.
+MeetingRoom.defaultProps = {
+  numParticipants: 0,
+  adminCount: 0,
+  layoutPreference: 'grid',
+  screenSize: 'large',
+};
+
 export default MeetingRoom;
