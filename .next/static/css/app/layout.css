@@ -502,6 +502,30 @@ video {
 [hidden]:where(:not([hidden="until-found"])) {
   display: none;
 }
+.container {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+.\!container {
+  width: 100% !important;
+  margin-right: auto !important;
+  margin-left: auto !important;
+  padding-right: 2rem !important;
+  padding-left: 2rem !important;
+}
+@media (min-width: 1400px) {
+
+  .container {
+    max-width: 1400px;
+  }
+
+  .\!container {
+    max-width: 1400px !important;
+  }
+}
 .sr-only {
   position: absolute;
   width: 1px;
@@ -594,6 +618,9 @@ video {
 }
 .ml-auto {
   margin-left: auto;
+}
+.block {
+  display: block;
 }
 .flex {
   display: flex;
@@ -972,6 +999,17 @@ video {
 }
 .bg-hero {
   background-image: url('/images/timeoverlay.png');
+}
+.bg-gradient-to-t {
+  background-image: linear-gradient(to top, var(--tw-gradient-stops));
+}
+.from-dark-1 {
+  --tw-gradient-from: #1C1F2E var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(28 31 46 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+.to-transparent {
+  --tw-gradient-to: transparent var(--tw-gradient-to-position);
 }
 .bg-cover {
   background-size: cover;
