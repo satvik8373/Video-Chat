@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   CallControls,
   CallParticipantsList,
@@ -25,6 +25,14 @@ import EndCallButton from './EndCallButton';
 import { cn } from '@/lib/utils';
 
 const layouts = ['grid', 'speaker-left', 'speaker-right', 'split-screen'];
+
+// Define the types for the component props
+interface MeetingRoomProps {
+  numParticipants: number;
+  adminCount: number;
+  layoutPreference: string;
+  screenSize: string;
+}
 
 const MeetingRoom: React.FC<MeetingRoomProps> = ({
   numParticipants,
