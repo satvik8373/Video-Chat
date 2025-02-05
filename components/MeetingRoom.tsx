@@ -10,7 +10,7 @@ import {
   useCallStateHooks,
 } from '@stream-io/video-react-sdk';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Users, LayoutList, Maximize2 } from 'lucide-react'; // Import Maximize2 for fullscreen icon
+import { Users, LayoutList, Maximize2 } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -25,7 +25,19 @@ import { cn } from '@/lib/utils';
 
 const layouts = ['grid', 'speaker-left', 'speaker-right', 'split-screen'];
 
-const MeetingRoom = ({ numParticipants, adminCount, layoutPreference, screenSize }) => {
+interface MeetingRoomProps {
+  numParticipants: number;
+  adminCount: number;
+  layoutPreference: string;
+  screenSize: string;
+}
+
+const MeetingRoom: React.FC<MeetingRoomProps> = ({
+  numParticipants,
+  adminCount,
+  layoutPreference,
+  screenSize,
+}) => {
   const searchParams = useSearchParams();
   const isPersonalRoom = !!searchParams.get('personal');
   const router = useRouter();
@@ -35,19 +47,18 @@ const MeetingRoom = ({ numParticipants, adminCount, layoutPreference, screenSize
   const callingState = useCallCallingState();
   const meetingRef = useRef(null);
 
-  // Fullscreen state to check if we're in fullscreen
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Fullscreen logic for mobile and desktop browsers
+  // Handle fullscreen logic
   const enterFullscreen = () => {
     if (meetingRef.current) {
       if (meetingRef.current.requestFullscreen) {
         meetingRef.current.requestFullscreen();
-      } else if (meetingRef.current.mozRequestFullScreen) { // Firefox
+      } else if (meetingRef.current.mozRequestFullScreen) {
         meetingRef.current.mozRequestFullScreen();
-      } else if (meetingRef.current.webkitRequestFullscreen) { // Safari
+      } else if (meetingRef.current.webkitRequestFullscreen) {
         meetingRef.current.webkitRequestFullscreen();
-      } else if (meetingRef.current.msRequestFullscreen) { // IE
+      } else if (meetingRef.current.msRequestFullscreen) {
         meetingRef.current.msRequestFullscreen();
       }
       setIsFullscreen(true);
@@ -57,17 +68,16 @@ const MeetingRoom = ({ numParticipants, adminCount, layoutPreference, screenSize
   const exitFullscreen = () => {
     if (document.exitFullscreen) {
       document.exitFullscreen();
-    } else if (document.mozCancelFullScreen) { // Firefox
+    } else if (document.mozCancelFullScreen) {
       document.mozCancelFullScreen();
-    } else if (document.webkitExitFullscreen) { // Safari
+    } else if (document.webkitExitFullscreen) {
       document.webkitExitFullscreen();
-    } else if (document.msExitFullscreen) { // IE
+    } else if (document.msExitFullscreen) {
       document.msExitFullscreen();
     }
     setIsFullscreen(false);
   };
 
-  // Check for fullscreen state change
   useEffect(() => {
     const handleFullscreenChange = () => {
       if (
@@ -87,14 +97,12 @@ const MeetingRoom = ({ numParticipants, adminCount, layoutPreference, screenSize
     document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     document.addEventListener('msfullscreenchange', handleFullscreenChange);
 
-    // If we have the room with many participants, adjust layout automatically
     if (numParticipants > 6) {
       setLayout('grid');
     } else if (adminCount > 1) {
       setLayout('split-screen');
     }
 
-    // Fullscreen logic when app opens in mobile Safari (add to home screen)
     if (window.navigator.standalone) {
       enterFullscreen();
     }
@@ -109,10 +117,8 @@ const MeetingRoom = ({ numParticipants, adminCount, layoutPreference, screenSize
 
   const toggleFullscreen = () => {
     if (isFullscreen) {
-      // Exit fullscreen if already in fullscreen
       exitFullscreen();
     } else {
-      // Enter fullscreen if not in fullscreen
       enterFullscreen();
     }
   };
