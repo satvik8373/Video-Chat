@@ -26,9 +26,10 @@ const MeetingChat = ({ meetingId, meetingTitle, user, isDarkMode, showChat, setS
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
       });
+      console.log('Token fetch response:', response.status, response.statusText);
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Failed to fetch token');
-      console.log(`Token fetched for user ${userId}`);
+      console.log(`Token fetched for user ${userId}:`, data.token.substring(0, 10) + '...'); // Log first 10 chars for security
       return data.token;
     } catch (err: any) {
       setError('Failed to authenticate with Stream Chat');
@@ -106,7 +107,10 @@ const MeetingChat = ({ meetingId, meetingTitle, user, isDarkMode, showChat, setS
                 className: 'min-h-[50px] resize-none',
               }}
               focus
-              onSendMessage={(messageText) => console.log(`User ${user.id} sent: ${messageText}`)} // Optional debug
+              onSendMessage={(messageText: string) => {
+                console.log(`User ${user.id} sent: ${messageText}`); // Optional debug
+                // Additional logic for sending the message can be added here
+              }}
             />
           </Window>
         </Channel>

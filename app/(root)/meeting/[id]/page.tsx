@@ -2,26 +2,31 @@
 
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { StreamCall, StreamTheme } from '@stream-io/video-react-sdk';
+import { StreamCall, StreamTheme, RingingCall } from '@stream-io/video-react-sdk';
 import { useParams } from 'next/navigation';
 import { Loader } from 'lucide-react';
-
+  
 import { useGetCallById } from '@/hooks/useGetCallById';
 import Alert from '@/components/Alert';
 import MeetingSetup from '@/components/MeetingSetup';
 import MeetingRoom from '@/components/MeetingRoom';
 
+const MyRingingCallUI = () => {
+  let call;
+  return (
+    <StreamCall call={call}>
+      <RingingCall />
+    </StreamCall>
+  );
+};
+
 const MeetingPage = () => {
   const { id } = useParams();
-  const safeId = id ?? ''; // Ensures `id` is a string
-  
-  const { call, isCallLoading } = useGetCallById(safeId);
-  
-  const [isSetupComplete, setIsSetupComplete] = useState(false);
   const { isLoaded, user } = useUser();
-  
+  const { call, isCallLoading } = useGetCallById(id);
+  const [isSetupComplete, setIsSetupComplete] = useState(false);
+
   if (!isLoaded || isCallLoading) return <Loader />;
-  
 
   if (!call) return (
     <p className="text-center text-3xl font-bold text-white">

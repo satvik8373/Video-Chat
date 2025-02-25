@@ -8,7 +8,7 @@
   box-sizing: border-box;
 }
 
-/* ======== Stream CSS Overrides ======== */
+/* ======== stream css overrides ======== */
 .str-video__call-stats {
   max-width: 500px;
   position: relative;
@@ -16,15 +16,16 @@
 
 .str-video__speaker-layout__wrapper {
   max-height: 700px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
 }
 
-.str-video__participant-details,
-.str-video__menu-container,
+.str-video__participant-details {
+  color: white;
+}
+
+.str-video__menu-container {
+  color: white;
+}
+
 .str-video__notification {
   color: white;
 }
@@ -35,33 +36,10 @@
   border-radius: 10px;
   color: white;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 .str-video__call-controls__button {
   height: 40px;
-}
-
-/* Split View Adjustments */
-.split-view {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 10px;
-  padding: 10px;
-  align-items: center;
-}
-
-.split-view .participant {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  overflow: hidden;
-  max-height: 400px;
 }
 
 .glassmorphism {
@@ -69,24 +47,21 @@
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
 }
-
 .glassmorphism2 {
   background: rgba(18, 17, 17, 0.25);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
-/* Clerk Class Overrides */
-.cl-userButtonPopoverActionButtonIcon,
-.cl-internal-wkkub3,
-.cl-userButtonPopoverActionButton {
+/* ==== clerk class override ===== */
+
+.cl-userButtonPopoverActionButtonIcon {
   color: white;
 }
 
 .cl-logoBox {
   height: 40px;
 }
-
 .cl-dividerLine {
   background: #252a41;
   height: 2px;
@@ -96,7 +71,15 @@
   border: 3px solid #565761;
 }
 
-/* Utilities */
+.cl-internal-wkkub3 {
+  color: white;
+}
+.cl-userButtonPopoverActionButton {
+  color: white;
+}
+
+/* =============================== */
+
 @layer utilities {
   .flex-center {
     @apply flex justify-center items-center;
@@ -107,7 +90,8 @@
   }
 }
 
-/* Animation */
+/* animation */
+
 .show-block {
   width: 100%;
   max-width: 350px;
@@ -126,4 +110,3 @@
     width: 100%;
   }
 }
-

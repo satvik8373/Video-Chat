@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Inter } from "next/font/google";
 
 import "@stream-io/video-react-sdk/dist/css/styles.css";
+import 'stream-chat-react/dist/css/v2/index.css';
 import "react-datepicker/dist/react-datepicker.css";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -11,11 +12,9 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "MAVRIX ROOM",
+  title: "Mavrix Room",
   description: "Video calling App",
-  icons: {
-    icon: "/icons/logo.svg",
-  },
+  
 };
 
 export default function RootLayout({
@@ -27,7 +26,7 @@ export default function RootLayout({
         appearance={{
           layout: {
             socialButtonsVariant: "iconButton",
-            logoImageUrl: "/icons/mavrix-logo.svg",
+            logoImageUrl: "/icons/Mavrix Room-logo.svg",
           },
           variables: {
             colorText: "#fff",
@@ -39,8 +38,10 @@ export default function RootLayout({
         }}
       >
         <body className={`${inter.className} bg-dark-2`}>
-          <Toaster />
-          {children}
+          <div className="min-h-screen">
+            <Toaster />
+            {children}
+          </div>
         </body>
       </ClerkProvider>
     </html>
