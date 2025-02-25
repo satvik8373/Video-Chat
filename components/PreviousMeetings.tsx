@@ -2,37 +2,28 @@
 import React, { useState } from 'react';
 import { getMeetingHistory, MeetingData, MeetingHistory } from '@/lib/Meetinghistory';
 import { cn } from '@/lib/utils';
-import { parseISO, isValid, differenceInSeconds, format, differenceInMinutes } from 'date-fns';
+import { parseISO, isValid, differenceInSeconds, format } from 'date-fns';
 import { useUser } from '@clerk/nextjs';
-import PreviousMeetings from '@/components/PreviousMeetings';
 
 const getSafeDuration = (start: Date | string, end?: Date | string): string => {
-  try {
-    const startDate = new Date(start);
-    const endDate = end ? new Date(end) : new Date();
-    
-    if (!isValid(startDate) || (end && !isValid(endDate))) {
-      return '0m 0s';
-    }
-
-    const seconds = differenceInSeconds(endDate, startDate);
-    return seconds > 0 
-      ? `${Math.floor(seconds / 60)}m ${seconds % 60}s`
-      : '0m 0s';
-  } catch {
+  const startDate = new Date(start);
+  const endDate = end ? new Date(end) : new Date();
+  
+  if (!isValid(startDate) || (end && !isValid(endDate))) {
     return '0m 0s';
   }
+
+  const seconds = differenceInSeconds(endDate, startDate);
+  return seconds > 0 
+    ? `${Math.floor(seconds / 60)}m ${seconds % 60}s`
+    : '0m 0s';
 };
 
 const formatMeetingDate = (date: Date | string) => {
-  try {
-    const safeDate = date instanceof Date ? date : parseISO(date);
-    return isValid(safeDate) 
-      ? format(safeDate, "MMM dd, yyyy 'at' h:mm a") 
-      : 'Date not available';
-  } catch {
-    return 'Date not available';
-  }
+  const safeDate = date instanceof Date ? date : parseISO(date);
+  return isValid(safeDate) 
+    ? format(safeDate, "MMM dd, yyyy 'at' h:mm a") 
+    : 'Date not available';
 };
 
 const PreviousMeetings = () => {
@@ -45,41 +36,33 @@ const PreviousMeetings = () => {
     new Date(b.date).getTime() - new Date(a.date).getTime()
   );
   const totalPages = Math.ceil(meetings.length / meetingsPerPage);
-
   const paginatedMeetings = meetings.slice(
     (currentPage - 1) * meetingsPerPage,
     currentPage * meetingsPerPage
   );
 
-  // Add state to track viewed meetings
   const [viewedMeetings, setViewedMeetings] = useState<Set<string>>(() => {
     const saved = localStorage.getItem('viewedMeetings');
     return new Set(saved ? JSON.parse(saved) : []);
   });
 
-  // Mark meeting as viewed
   const markAsViewed = (meetingId: string) => {
     const updated = new Set(viewedMeetings).add(meetingId);
     setViewedMeetings(updated);
     localStorage.setItem('viewedMeetings', JSON.stringify(Array.from(updated)));
   };
 
-  // Update the meeting card click handler
   const handleMeetingClick = (meeting: MeetingHistory) => {
     setSelectedMeeting(meeting);
     markAsViewed(meeting.id);
   };
 
-  // Update the recent meeting check
   const isRecent = (meetingDate: Date) => {
-    const now = new Date();
-    return now.getTime() - new Date(meetingDate).getTime() < 24 * 60 * 60 * 1000;
+    return new Date().getTime() - new Date(meetingDate).getTime() < 24 * 60 * 60 * 1000;
   };
 
-  // Add state for selected meeting details
   const [selectedDetails, setSelectedDetails] = useState<MeetingData | null>(null);
 
-  // Add modal component
   const MeetingDetailsModal = ({ meeting }: { meeting: MeetingData }) => {
     const start = meeting.startTime instanceof Date ? meeting.startTime : parseISO(meeting.startTime);
     const end = meeting.endTime instanceof Date ? meeting.endTime : parseISO(meeting.endTime);
@@ -88,7 +71,6 @@ const PreviousMeetings = () => {
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
         <div className="bg-background p-6 rounded-lg max-w-2xl w-full">
           <h2 className="text-2xl font-bold mb-4">{meeting.title}</h2>
-          
           <div className="grid grid-cols-2 gap-4 mb-6">
             <div>
               <h3 className="font-semibold mb-2">Meeting Time</h3>
@@ -102,47 +84,31 @@ const PreviousMeetings = () => {
               <p className="text-sm">{meeting.participants.length} attendees</p>
             </div>
           </div>
-
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div>
-              <h3 className="font-semibold mb-2">Meeting Creator</h3>
-              <p className="text-sm">
-                {meeting.createdBy === user?.id ? 'You' : meeting.createdBy}
-              </p>
-            </div>
-          </div>
-
+          <h3 className="font-semibold mb-2">Meeting Creator</h3>
+          <p className="text-sm">{meeting.createdBy === user?.id ? 'You' : meeting.createdBy}</p>
           <h3 className="font-semibold mb-2">Participant Details</h3>
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {meeting.participants
-              .filter(p => 
-                meeting.createdBy === user?.id || 
-                p.userId === user?.id
-              )
+              .filter(p => meeting.createdBy === user?.id || p.userId === user?.id)
               .map((participant, index) => (
                 <div key={index} className="flex items-center gap-2 mb-2">
                   <div className="w-8 h-8 rounded-full bg-dark-3 flex items-center justify-center">
-                    <span className="text-xs">
-                      {participant.userName[0].toUpperCase()}
-                    </span>
+                    <span className="text-xs">{participant.userName[0].toUpperCase()}</span>
                   </div>
                   <div>
-                    <p className="text-sm font-medium">
-                      {participant.userName}
+                    <p className="text-sm font-medium">{participant.userName}
                       {meeting.createdBy === participant.userId && (
                         <span className="ml-2 text-xs text-green-400">(Host)</span>
                       )}
                     </p>
                     <p className="text-xs text-gray-400">
                       Joined: {new Date(participant.entryTime).toLocaleTimeString()}
-                      {participant.leaveTime && 
-                        ` - Left: ${new Date(participant.leaveTime).toLocaleTimeString()}`}
+                      {participant.leaveTime && ` - Left: ${new Date(participant.leaveTime).toLocaleTimeString()}`}
                     </p>
                   </div>
                 </div>
               ))}
           </div>
-
           <button
             onClick={() => setSelectedDetails(null)}
             className="mt-4 w-full bg-primary text-primary-foreground py-2 rounded hover:bg-primary/90"
@@ -176,8 +142,6 @@ const PreviousMeetings = () => {
           </button>
         </div>
       </div>
-
-      
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {paginatedMeetings.map((meeting) => {
           const recent = isRecent(meeting.date);
@@ -237,7 +201,6 @@ const PreviousMeetings = () => {
                   {meeting.roomType}
                 </span>
               </div>
-
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div className="space-y-1">
                   <p className="text-gray-400">Duration</p>
@@ -295,57 +258,36 @@ const PreviousMeetings = () => {
                 </thead>
                 <tbody>
                   {selectedMeeting.participants.map((participant, index) => {
-                    const duration = getSafeDuration(
-                      participant.entryTime,
-                      participant.leaveTime
-                    );
-
+                    const duration = getSafeDuration(participant.entryTime, participant.leaveTime);
                     return (
                       <tr key={index} className="border-b border-dark-3 hover:bg-dark-2">
                         <td className="p-3">
                           <div className="flex items-center gap-2 mb-2">
                             <div className="w-8 h-8 rounded-full bg-dark-3 flex items-center justify-center">
-                              <span className="text-xs">
-                                {participant.userName[0].toUpperCase()}
-                              </span>
+                              <span className="text-xs">{participant.userName[0].toUpperCase()}</span>
                             </div>
                             <div>
                               <p className="text-sm font-medium">{participant.userName}</p>
-                              <p className="text-xs text-gray-400">
-                                {participant.connectionType} • {participant.deviceType}
-                              </p>
+                              <p className="text-xs text-gray-400">{participant.connectionType} • {participant.deviceType}</p>
                             </div>
                           </div>
                         </td>
                         <td className="p-3">
                           <p className="capitalize">{participant.deviceType}</p>
-                          <p className="text-xs text-gray-400">
-                            {participant.connectionType}
-                          </p>
+                          <p className="text-xs text-gray-400">{participant.connectionType}</p>
                         </td>
-                        <td className="p-3">
-                          {format(new Date(participant.entryTime), 'HH:mm')}
-                        </td>
-                        <td className="p-3">
-                          {participant.leaveTime ? format(new Date(participant.leaveTime), 'HH:mm') : 'Active'}
-                        </td>
-                        <td className="p-3">
-                          <span className="ml-2 text-primary">({duration})</span>
-                        </td>
+                        <td className="p-3">{format(new Date(participant.entryTime), 'HH:mm')}</td>
+                        <td className="p-3">{participant.leaveTime ? format(new Date(participant.leaveTime), 'HH:mm') : 'Active'}</td>
+                        <td className="p-3"><span className="ml-2 text-primary">({duration})</span></td>
                       </tr>
                     );
                   })}
                 </tbody>
               </table>
             </div>
-
-            {/* For total meeting duration */}
             <div className="mt-4">
               <h3 className="text-lg font-semibold">
-                Total Duration: {getSafeDuration(
-                  selectedMeeting.startTime,
-                  selectedMeeting.endTime
-                )}
+                Total Duration: {getSafeDuration(selectedMeeting.startTime, selectedMeeting.endTime)}
               </h3>
             </div>
           </div>
