@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import PreviousMeetings from '@/components/PreviousMeetings';
 import { useUser } from '@clerk/nextjs';
