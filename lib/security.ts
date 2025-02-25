@@ -1,4 +1,4 @@
-import { MeetingData, ParticipantData } from './Meetinghistory';
+import { MeetingData, userData } from './Meetinghistory';
 
 export const getMeetingVisibility = (
   meeting: MeetingData,

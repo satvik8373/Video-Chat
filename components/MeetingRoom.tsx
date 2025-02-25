@@ -29,6 +29,15 @@ import EndCallButton from './EndCallButton'; // Ensure this import exists
 
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
 
+interface UserData {
+  userId: string;
+  userName: string;
+  entryTime: Date;
+  leaveTime?: Date;
+  deviceType: string;
+  connectionType: string;
+}
+
 const MeetingRoom = () => {
   const searchParams = useSearchParams();
   const isPersonalRoom = !!searchParams.get('personal');
@@ -40,7 +49,7 @@ const MeetingRoom = () => {
   const meetingId = searchParams.get('id') || crypto.randomUUID();
   const roomType = isPersonalRoom ? 'personal' : 'conference';
   const meetingTitle = searchParams.get('title') || 'Untitled Meeting';
-  const [userData, setUserData] = useState<ParticipantData[]>([]);
+  const [userData, setUserData] = useState<UserData[]>([]);
   const { user } = useUser();
   const callingState = useCallCallingState();
   const [isAdmin, setIsAdmin] = useState(false);
@@ -50,14 +59,14 @@ const MeetingRoom = () => {
     const existingEntry = userData.find((p) => p.userId === user?.id && !p.leaveTime);
     if (existingEntry) return;
 
-    const participantData: ParticipantData = {
+    const newUserData: UserData = {
       userId: user?.id || 'unknown',
       userName: user?.fullName || user?.username || 'Anonymous',
       entryTime: new Date(),
       deviceType: navigator.userAgent.match(/mobile/i) ? 'mobile' : 'desktop',
       connectionType: 'web',
     };
-    setUserData((prev) => [...prev, participantData]);
+    setUserData((prev) => [...prev, newUserData]);
   };
 
   const logUserLeave = (index: number) => {
@@ -175,7 +184,7 @@ const MeetingRoom = () => {
                 );
               }
             }
-          router.push('/');
+            router.push('/');
           }}
         />
 
@@ -239,19 +248,7 @@ const MeetingRoom = () => {
         </button>
         {!isPersonalRoom && (
           <EndCallButton
-            onClick={() => {
-              const userIndex = userData.findIndex((p) => p.userId === user?.id);
-              if (userIndex !== -1) {
-                saveMeetingData(
-                  meetingId,
-                  [{ ...userData[userIndex], leaveTime: new Date() }],
-                  roomType,
-                  meetingTitle,
-                  user?.id || 'unknown'
-                );
-              }
-          router.push('/');
-            }}
+          
           />
         )}
       </div>

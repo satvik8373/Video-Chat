@@ -1,4 +1,4 @@
-interface ParticipantData {
+interface userData {
     userId: string;
     userName: string;
     entryTime: Date | string;
@@ -9,7 +9,7 @@ interface ParticipantData {
   
   export interface MeetingData {
     meetingId: string;
-    participants: ParticipantData[];
+    participants: userData[];
     roomType: string;
     meetingTitle: string;
     userId: string;
@@ -19,7 +19,7 @@ interface ParticipantData {
   
   export const saveMeetingData = (
     meetingId: string,
-    participants: ParticipantData[],
+    participants: userData[],
     roomType: string,
     meetingTitle: string,
     userId: string
@@ -48,7 +48,7 @@ interface ParticipantData {
   // Type definitions
   export interface MeetingData {
     meetingId: string;
-    participants: ParticipantData[];
+    participants: userData[];
     roomType: string;
     meetingTitle: string;
     userId: string;

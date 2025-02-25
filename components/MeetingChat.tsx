@@ -16,7 +16,6 @@ type MeetingChatProps = {
 
 const MeetingChat = ({ meetingId, meetingTitle, user, isDarkMode, showChat, setShowChat }: MeetingChatProps) => {
   const [chatClient, setChatClient] = useState<StreamChat | null>(null);
-  const [channel, setChannel] = useState<Channel | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fetchStreamToken = async (userId: string) => {
@@ -68,7 +67,6 @@ const MeetingChat = ({ meetingId, meetingTitle, user, isDarkMode, showChat, setS
           console.log(`Added user ${user.id} to channel ${meetingId}`);
         }
         setChatClient(client);
-        setChannel(chatChannel);
       } catch (err) {
         setError('Failed to initialize chat');
         console.error('Chat initialization error:', err);
@@ -86,7 +84,7 @@ const MeetingChat = ({ meetingId, meetingTitle, user, isDarkMode, showChat, setS
   }, [user, meetingId, meetingTitle, showChat]);
 
   if (error) return <div className="text-red-500 p-4">{error}</div>;
-  if (!chatClient || !channel) return null; // Don’t show loading when hidden
+  if (!chatClient ) return null; // Don’t show loading when hidden
 
   return (
     <div
@@ -97,7 +95,7 @@ const MeetingChat = ({ meetingId, meetingTitle, user, isDarkMode, showChat, setS
       )}
     >
       <Chat client={chatClient} theme={isDarkMode ? 'messaging dark' : 'messaging light'}>
-        <Channel channel={channel}>
+        <Channel>
           <Window>
             <ChannelHeader />
             <MessageList />
@@ -107,10 +105,7 @@ const MeetingChat = ({ meetingId, meetingTitle, user, isDarkMode, showChat, setS
                 className: 'min-h-[50px] resize-none',
               }}
               focus
-              onSendMessage={(messageText: string) => {
-                console.log(`User ${user.id} sent: ${messageText}`); // Optional debug
-                // Additional logic for sending the message can be added here
-              }}
+          
             />
           </Window>
         </Channel>
@@ -118,5 +113,5 @@ const MeetingChat = ({ meetingId, meetingTitle, user, isDarkMode, showChat, setS
     </div>
   );
 };
-
+  
 export default MeetingChat;
