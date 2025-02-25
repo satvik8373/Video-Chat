@@ -1,4 +1,3 @@
-import { MeetingData } from '@/lib/Meetinghistory';
 
 interface ParticipantData {
     userId: string;

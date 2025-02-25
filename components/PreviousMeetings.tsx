@@ -4,6 +4,7 @@ import { getMeetingHistory, MeetingData, MeetingHistory } from '@/lib/Meetinghis
 import { cn } from '@/lib/utils';
 import { parseISO, isValid, differenceInSeconds, format, differenceInMinutes } from 'date-fns';
 import { useUser } from '@clerk/nextjs';
+import PreviousMeetings from '@/components/PreviousMeetings';
 
 const getSafeDuration = (start: Date | string, end?: Date | string): string => {
   try {

@@ -22,9 +22,8 @@ import {
   DropdownMenuSubTrigger,
 } from './ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { saveMeetingData, ParticipantData } from '@/lib/Meetinghistory';
 import MeetingChat from './MeetingChat';
-import EndCallButton from './EndCallButton'; // Ensure this import exists
+import EndCallButton from './EndCallButton';
 
 type CallLayoutType = 'grid' | 'speaker-left' | 'speaker-right';
 
@@ -43,6 +42,7 @@ const MeetingRoom = () => {
   const { user } = useUser();
   const [isAdmin, setIsAdmin] = useState(false);
   const [showChat, setShowChat] = useState(false);
+  const callingState = useCallCallingState();
 
   const logUserEntry = () => {
     const existingEntry = userData.find((p) => p.userId === user?.id && !p.leaveTime);
@@ -131,6 +131,20 @@ const MeetingRoom = () => {
     window.open(urls[provider] || urls.default, '_blank', 'noopener,noreferrer');
   };
 
+  const handleEndCall = () => {
+    const userIndex = userData.findIndex((p) => p.userId === user?.id);
+    if (userIndex !== -1) {
+      saveMeetingData(
+        meetingId,
+        [{ ...userData[userIndex], leaveTime: new Date() }],
+        roomType,
+        meetingTitle,
+        user?.id || 'unknown'
+      );
+    }
+    router.push('/');
+  };
+
   return (
     <section className={`relative h-screen w-full overflow-hidden pt-4 ${isDarkMode ? 'bg-dark-1 text-white' : 'bg-white text-black'}`}>
       <div className="relative flex size-full items-center justify-center">
@@ -152,29 +166,7 @@ const MeetingRoom = () => {
 
       <div className="fixed bottom-0 flex w-full items-center justify-center gap-5">
         <CallControls
-          onLeave={() => {
-            if (isPersonalRoom) {
-              saveMeetingData(
-                meetingId,
-                userData.map((p) => ({ ...p, leaveTime: p.leaveTime || new Date() })),
-                roomType,
-                meetingTitle,
-                user?.id || 'unknown'
-              );
-            } else {
-              const userIndex = userData.findIndex((p) => p.userId === user?.id);
-              if (userIndex !== -1) {
-                saveMeetingData(
-                  meetingId,
-                  [{ ...userData[userIndex], leaveTime: new Date() }],
-                  roomType,
-                  meetingTitle,
-                  user?.id || 'unknown'
-                );
-              }
-            }
-          router.push('/');
-          }}
+          onLeave={handleEndCall}
         />
 
         <DropdownMenu>
@@ -236,21 +228,7 @@ const MeetingRoom = () => {
           </div>
         </button>
         {!isPersonalRoom && (
-          <EndCallButton
-            onClick={() => {
-              const userIndex = userData.findIndex((p) => p.userId === user?.id);
-              if (userIndex !== -1) {
-                saveMeetingData(
-                  meetingId,
-                  [{ ...userData[userIndex], leaveTime: new Date() }],
-                  roomType,
-                  meetingTitle,
-                  user?.id || 'unknown'
-                );
-              }
-          router.push('/');
-            }}
-          />
+          <EndCallButton onClick={handleEndCall} />
         )}
       </div>
 
