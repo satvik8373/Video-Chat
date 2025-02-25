@@ -1,3 +1,5 @@
+import { MeetingData } from '@/lib/Meetinghistory';
+
 interface ParticipantData {
     userId: string;
     userName: string;
@@ -8,13 +10,13 @@ interface ParticipantData {
   }
   
   export interface MeetingData {
-    id: string;
-    title: string;
+    meetingId: string;
     participants: ParticipantData[];
-    startTime: Date | string;
-    endTime: Date | string;
     roomType: string;
-    createdBy: string;
+    meetingTitle: string;
+    userId: string;
+    startTime?: Date;
+    endTime?: Date;
   }
   
   export const saveMeetingData = (
