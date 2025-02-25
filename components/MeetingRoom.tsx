@@ -4,7 +4,6 @@ import {
   CallControls,
   CallParticipantsList,
   CallStatsButton,
-  CallingState,
   PaginatedGridLayout,
   SpeakerLayout,
   useCallStateHooks,
@@ -23,7 +22,7 @@ import {
   DropdownMenuSubTrigger,
 } from './ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { saveMeetingData } from '@/lib/Meetinghistory';
+import { saveMeetingData, ParticipantData } from '@/lib/Meetinghistory';
 import MeetingChat from './MeetingChat';
 import EndCallButton from './EndCallButton'; // Ensure this import exists
 
@@ -42,7 +41,6 @@ const MeetingRoom = () => {
   const meetingTitle = searchParams.get('title') || 'Untitled Meeting';
   const [userData, setUserData] = useState<ParticipantData[]>([]);
   const { user } = useUser();
-  const callingState = useCallCallingState();
   const [isAdmin, setIsAdmin] = useState(false);
   const [showChat, setShowChat] = useState(false);
 

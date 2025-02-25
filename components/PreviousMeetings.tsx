@@ -1,6 +1,6 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { getMeetingHistory, ParticipantData, MeetingData, MeetingHistory } from '@/lib/Meetinghistory';
+import React, { useState } from 'react';
+import { getMeetingHistory, MeetingData, MeetingHistory } from '@/lib/Meetinghistory';
 import { cn } from '@/lib/utils';
 import { parseISO, isValid, differenceInSeconds, format, differenceInMinutes } from 'date-fns';
 import { useUser } from '@clerk/nextjs';
@@ -74,12 +74,6 @@ const PreviousMeetings = () => {
     const now = new Date();
     return now.getTime() - new Date(meetingDate).getTime() < 24 * 60 * 60 * 1000;
   };
-
-  // Add this near your meeting list header
-  const totalParticipants = useState(0)[0];
-
-  // Add this near your meeting list header
-  const totalDuration = useState(0)[0];
 
   // Add state for selected meeting details
   const [selectedDetails, setSelectedDetails] = useState<MeetingData | null>(null);
@@ -155,30 +149,6 @@ const PreviousMeetings = () => {
             Close Details
           </button>
         </div>
-      </div>
-    );
-  };
-
-  const TotalDurationDisplay = ({ meeting }: { meeting: MeetingData }) => {
-    const start = meeting.startTime instanceof Date ? meeting.startTime : parseISO(meeting.startTime);
-    const end = meeting.endTime instanceof Date ? meeting.endTime : parseISO(meeting.endTime);
-
-    if (!isValid(start) || !isValid(end)) {
-      return (
-        <div className="text-red-500 text-sm">
-          Invalid time data • Please check meeting logs
-        </div>
-      );
-    }
-
-    const totalMinutes = differenceInMinutes(end, start);
-    const formattedDuration = isNaN(totalMinutes) 
-      ? 'Duration unavailable' 
-      : `${totalMinutes} minutes`;
-
-    return (
-      <div className="duration-display text-sm">
-        Total Duration: {formattedDuration}
       </div>
     );
   };

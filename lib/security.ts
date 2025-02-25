@@ -1,3 +1,5 @@
+import { MeetingData, ParticipantData } from './Meetinghistory';
+
 export const getMeetingVisibility = (
   meeting: MeetingData,
   currentUserId?: string
