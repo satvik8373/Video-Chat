@@ -1,4 +1,3 @@
-
 interface ParticipantData {
     userId: string;
     userName: string;
@@ -22,34 +21,11 @@ interface ParticipantData {
     meetingId: string,
     participants: ParticipantData[],
     roomType: string,
-    title: string,
-    createdById: string
+    meetingTitle: string,
+    userId: string
   ) => {
-    const history = getMeetingHistory();
-    const existingMeeting = history.find(m => m.id === meetingId);
-
-    const meetingData: MeetingData = {
-      id: meetingId,
-      title,
-      participants: participants.map(p => ({
-        ...p,
-        entryTime: new Date(p.entryTime).toISOString(),
-        leaveTime: p.leaveTime ? new Date(p.leaveTime).toISOString() : undefined
-      })),
-      startTime: participants[0]?.entryTime.toISOString(),
-      endTime: new Date().toISOString(),
-      roomType,
-      createdBy: createdById
-    };
-
-    if (existingMeeting) {
-      meetingData.createdBy = existingMeeting.createdBy;
-      Object.assign(existingMeeting, meetingData);
-    } else {
-      history.unshift(meetingData);
-    }
-
-    localStorage.setItem('meetingHistory', JSON.stringify(history));
+    console.log('Saving meeting data:', { meetingId, participants, roomType, meetingTitle, userId });
+    // Add your logic to save the data here
   };
   
   export const getMeetingHistory = (): MeetingData[] => {
