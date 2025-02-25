@@ -67,3 +67,18 @@ interface ParticipantData {
     localStorage.removeItem('meetingHistory');
     return [];
   };
+
+  // Type definitions
+  export interface MeetingData {
+    meetingId: string;
+    participants: ParticipantData[];
+    roomType: string;
+    meetingTitle: string;
+    userId: string;
+    startTime?: Date;
+    endTime?: Date;
+  }
+
+  export interface MeetingHistory {
+    meetings: MeetingData[];
+  }

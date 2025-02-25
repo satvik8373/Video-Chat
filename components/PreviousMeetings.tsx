@@ -1,10 +1,9 @@
 'use client';
-import { getMeetingHistory } from '@/lib/Meetinghistory';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getMeetingHistory, ParticipantData, MeetingData, MeetingHistory } from '@/lib/Meetinghistory';
 import { cn } from '@/lib/utils';
 import { parseISO, isValid, differenceInSeconds, format, differenceInMinutes } from 'date-fns';
 import { useUser } from '@clerk/nextjs';
-import { saveMeetingData } from '@/lib/Meetinghistory';
 
 const getSafeDuration = (start: Date | string, end?: Date | string): string => {
   try {
@@ -77,16 +76,10 @@ const PreviousMeetings = () => {
   };
 
   // Add this near your meeting list header
-  const totalParticipants = meetings.reduce(
-    (acc, meeting) => acc + meeting.participants.length,
-    0
-  );
+  const totalParticipants = useState(0)[0];
 
   // Add this near your meeting list header
-  const totalDuration = meetings.reduce(
-    (acc, meeting) => acc + (meeting.duration || 0),
-    0
-  );
+  const totalDuration = useState(0)[0];
 
   // Add state for selected meeting details
   const [selectedDetails, setSelectedDetails] = useState<MeetingData | null>(null);
